@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DCS Same Day — Teal Brand Palette (#0d7377 → hsl(182, 78%, 25%))
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* LIGHT MODE */
+:root {
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --badge-outline: rgba(0, 0, 0, 0.05);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
+
+  --background: 182 25% 97%;
+  --foreground: 182 40% 8%;
+  --border: 182 12% 88%;
+  --card: 0 0% 100%;
+  --card-foreground: 182 40% 8%;
+  --card-border: 182 10% 92%;
+
+  --sidebar: 182 20% 96%;
+  --sidebar-foreground: 182 40% 8%;
+  --sidebar-border: 182 12% 88%;
+  --sidebar-primary: 182 78% 25%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 182 12% 92%;
+  --sidebar-accent-foreground: 182 40% 8%;
+  --sidebar-ring: 182 78% 25%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 182 40% 8%;
+  --popover-border: 182 12% 88%;
+
+  --primary: 182 78% 25%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 182 10% 93%;
+  --secondary-foreground: 182 40% 8%;
+  --muted: 182 8% 93%;
+  --muted-foreground: 182 10% 42%;
+  --accent: 182 12% 92%;
+  --accent-foreground: 182 40% 8%;
+  --destructive: 0 84% 42%;
+  --destructive-foreground: 0 0% 98%;
+  --input: 182 10% 78%;
+  --ring: 182 78% 25%;
+
+  --chart-1: 182 78% 25%;
+  --chart-2: 182 55% 42%;
+  --chart-3: 43 74% 49%;
+  --chart-4: 200 60% 45%;
+  --chart-5: 262 50% 48%;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'JetBrains Mono', Menlo, monospace;
+  --radius: 0.5rem;
+
+  --shadow-2xs: 0 1px 2px hsl(182 20% 20% / 0.04);
+  --shadow-xs: 0 1px 3px hsl(182 20% 20% / 0.06);
+  --shadow-sm: 0 1px 3px hsl(182 20% 20% / 0.06), 0 1px 2px -1px hsl(182 20% 20% / 0.06);
+  --shadow: 0 2px 4px hsl(182 20% 20% / 0.06), 0 1px 2px -1px hsl(182 20% 20% / 0.06);
+  --shadow-md: 0 4px 8px hsl(182 20% 20% / 0.08), 0 2px 4px -1px hsl(182 20% 20% / 0.06);
+  --shadow-lg: 0 8px 16px hsl(182 20% 20% / 0.1), 0 4px 6px -1px hsl(182 20% 20% / 0.06);
+  --shadow-xl: 0 16px 32px hsl(182 20% 20% / 0.12), 0 8px 10px -1px hsl(182 20% 20% / 0.06);
+  --shadow-2xl: 0 24px 48px hsl(182 20% 20% / 0.18);
+
+  --spacing: 0.25rem;
+
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --primary-border: hsl(var(--primary));
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+}
+
+/* DARK MODE (default for DCS) */
+.dark {
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
+  --background: 182 30% 6%;
+  --foreground: 0 0% 93%;
+  --border: 182 15% 18%;
+  --card: 182 25% 9%;
+  --card-foreground: 0 0% 93%;
+  --card-border: 182 18% 14%;
+
+  --sidebar: 182 22% 8%;
+  --sidebar-foreground: 0 0% 93%;
+  --sidebar-border: 182 15% 15%;
+  --sidebar-primary: 182 70% 35%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 182 15% 15%;
+  --sidebar-accent-foreground: 0 0% 93%;
+  --sidebar-ring: 182 70% 35%;
+
+  --popover: 182 22% 10%;
+  --popover-foreground: 0 0% 93%;
+  --popover-border: 182 15% 18%;
+
+  --primary: 182 70% 35%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 182 12% 16%;
+  --secondary-foreground: 0 0% 93%;
+  --muted: 182 10% 18%;
+  --muted-foreground: 182 6% 55%;
+  --accent: 182 12% 16%;
+  --accent-foreground: 0 0% 93%;
+  --destructive: 0 72% 50%;
+  --destructive-foreground: 0 0% 98%;
+  --input: 182 12% 25%;
+  --ring: 182 70% 35%;
+
+  --chart-1: 182 70% 42%;
+  --chart-2: 182 45% 55%;
+  --chart-3: 43 74% 65%;
+  --chart-4: 200 60% 60%;
+  --chart-5: 262 50% 65%;
+
+  --shadow-2xs: 0 1px 2px hsl(0 0% 0% / 0.2);
+  --shadow-xs: 0 1px 3px hsl(0 0% 0% / 0.3);
+  --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.3), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+  --shadow: 0 2px 4px hsl(0 0% 0% / 0.3), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+  --shadow-md: 0 4px 8px hsl(0 0% 0% / 0.35), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+  --shadow-lg: 0 8px 16px hsl(0 0% 0% / 0.4), 0 4px 6px -1px hsl(0 0% 0% / 0.2);
+  --shadow-xl: 0 16px 32px hsl(0 0% 0% / 0.45), 0 8px 10px -1px hsl(0 0% 0% / 0.2);
+  --shadow-2xl: 0 24px 48px hsl(0 0% 0% / 0.5);
+
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --primary-border: hsl(var(--primary));
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* ── Desktop Sidebar ─────────────────────────────────────────────────── */
+.dcs-sidebar {
+  background: hsl(var(--sidebar));
+  color: hsl(var(--sidebar-foreground));
+  width: 224px;
+  min-height: 100vh;
+  flex-shrink: 0;
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+.dcs-sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+  margin: 1px 8px;
+}
+.dcs-sidebar-nav-item:hover {
+  background: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-foreground));
+}
+.dcs-sidebar-nav-item.active {
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.dcs-topbar {
+  background: hsl(var(--sidebar));
+  height: 52px;
+  display: none;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  border-bottom: 1px solid hsl(var(--sidebar-border));
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ── Page content ─────────────────────────────────────────────────────── */
+.dcs-page-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dcs-mobile-menu-btn { display: none; }
+.dcs-mobile-bottom-nav { display: none; }
+
+button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+* { -webkit-overflow-scrolling: touch; }
+html { height: -webkit-fill-available; }
+body { min-height: -webkit-fill-available; }
+
+@media (max-width: 768px) {
+  .dcs-sidebar { display: none !important; }
+
+  .dcs-topbar {
+    display: flex !important;
+    height: 48px;
+    padding: 0 14px;
+  }
+  .dcs-mobile-menu-btn { display: flex !important; }
+
+  .dcs-mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: hsl(var(--sidebar));
+    border-top: 1px solid hsl(var(--sidebar-border));
+    z-index: 200;
+    padding: 4px 0;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+  .dcs-mobile-bottom-nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: color 0.15s;
+  }
+  .dcs-mobile-bottom-nav a.active {
+    color: hsl(var(--primary));
+  }
+
+  .dcs-page-content {
+    padding-bottom: 72px;
+  }
+
+  img, canvas, iframe, video { max-width: 100% !important; }
+}
