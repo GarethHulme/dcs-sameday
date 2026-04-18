@@ -53,7 +53,9 @@ export async function registerRoutes(server: Server, app: Express) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
-    const user = storage.getUserByEmail(email);
+    // Support login by username or email
+    let user = storage.getUserByEmail(email);
+    if (!user) user = storage.getUserByEmail(email + "@dcs.com");
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
     const valid = await verifyPassword(password, user.passwordHash);
@@ -523,14 +525,14 @@ export async function registerRoutes(server: Server, app: Express) {
   app.post("/api/seed", async (req: Request, res: Response) => {
     try {
       // Check if already seeded
-      const existing = storage.getUserByEmail("admin@dcs.com");
+      const existing = storage.getUserByEmail("admin");
       if (existing) return res.json({ message: "Already seeded" });
 
       const now = new Date().toISOString();
 
       // Create admin
       const admin = storage.createUser({
-        email: "admin@dcs.com",
+        email: "admin",
         passwordHash: await hashPassword("admin123"),
         name: "Gareth Hulme",
         role: "admin",
