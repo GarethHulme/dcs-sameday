@@ -79,8 +79,16 @@ app.use((req, res, next) => {
     }
 
     const port = parseInt(process.env.PORT || "5000", 10);
-    httpServer.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
+    httpServer.listen({ port, host: "0.0.0.0", reusePort: true }, async () => {
       log(`DCS Same Day serving on port ${port}`);
+      // Auto-seed demo data on startup
+      try {
+        const res = await fetch(`http://localhost:${port}/api/seed`, { method: "POST" });
+        const data = await res.json() as any;
+        log(`Auto-seed: ${data.message || "done"}`);
+      } catch (e: any) {
+        log(`Auto-seed skipped: ${e.message}`);
+      }
     });
   } catch (err) {
     console.error("[FATAL] Server startup failed:", err);
