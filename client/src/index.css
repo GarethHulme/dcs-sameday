@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DCS Same Day — Teal Brand Palette (#0d7377 → hsl(182, 78%, 25%))
+   DCS Same Day — Forest Green Brand Palette (hsl 160)
+   Matches Command Suite: hsl(160, 65%, 28%) primary
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* LIGHT MODE */
@@ -14,41 +15,41 @@
   --elevate-1: rgba(0, 0, 0, 0.03);
   --elevate-2: rgba(0, 0, 0, 0.08);
 
-  --background: 182 25% 97%;
-  --foreground: 182 40% 8%;
-  --border: 182 12% 88%;
+  --background: 160 25% 97%;
+  --foreground: 160 40% 8%;
+  --border: 160 12% 88%;
   --card: 0 0% 100%;
-  --card-foreground: 182 40% 8%;
-  --card-border: 182 10% 92%;
+  --card-foreground: 160 40% 8%;
+  --card-border: 160 10% 92%;
 
-  --sidebar: 182 20% 96%;
-  --sidebar-foreground: 182 40% 8%;
-  --sidebar-border: 182 12% 88%;
-  --sidebar-primary: 182 78% 25%;
+  --sidebar: 160 20% 96%;
+  --sidebar-foreground: 160 40% 8%;
+  --sidebar-border: 160 12% 88%;
+  --sidebar-primary: 160 65% 28%;
   --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 182 12% 92%;
-  --sidebar-accent-foreground: 182 40% 8%;
-  --sidebar-ring: 182 78% 25%;
+  --sidebar-accent: 160 12% 92%;
+  --sidebar-accent-foreground: 160 40% 8%;
+  --sidebar-ring: 160 65% 28%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 182 40% 8%;
-  --popover-border: 182 12% 88%;
+  --popover-foreground: 160 40% 8%;
+  --popover-border: 160 12% 88%;
 
-  --primary: 182 78% 25%;
+  --primary: 160 65% 28%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 182 10% 93%;
-  --secondary-foreground: 182 40% 8%;
-  --muted: 182 8% 93%;
-  --muted-foreground: 182 10% 42%;
-  --accent: 182 12% 92%;
-  --accent-foreground: 182 40% 8%;
+  --secondary: 160 10% 93%;
+  --secondary-foreground: 160 40% 8%;
+  --muted: 160 8% 93%;
+  --muted-foreground: 160 10% 42%;
+  --accent: 160 12% 92%;
+  --accent-foreground: 160 40% 8%;
   --destructive: 0 84% 42%;
   --destructive-foreground: 0 0% 98%;
-  --input: 182 10% 78%;
-  --ring: 182 78% 25%;
+  --input: 160 10% 78%;
+  --ring: 160 65% 28%;
 
-  --chart-1: 182 78% 25%;
-  --chart-2: 182 55% 42%;
+  --chart-1: 160 65% 28%;
+  --chart-2: 160 45% 42%;
   --chart-3: 43 74% 49%;
   --chart-4: 200 60% 45%;
   --chart-5: 262 50% 48%;
@@ -58,24 +59,47 @@
   --font-mono: 'JetBrains Mono', Menlo, monospace;
   --radius: 0.5rem;
 
-  --shadow-2xs: 0 1px 2px hsl(182 20% 20% / 0.04);
-  --shadow-xs: 0 1px 3px hsl(182 20% 20% / 0.06);
-  --shadow-sm: 0 1px 3px hsl(182 20% 20% / 0.06), 0 1px 2px -1px hsl(182 20% 20% / 0.06);
-  --shadow: 0 2px 4px hsl(182 20% 20% / 0.06), 0 1px 2px -1px hsl(182 20% 20% / 0.06);
-  --shadow-md: 0 4px 8px hsl(182 20% 20% / 0.08), 0 2px 4px -1px hsl(182 20% 20% / 0.06);
-  --shadow-lg: 0 8px 16px hsl(182 20% 20% / 0.1), 0 4px 6px -1px hsl(182 20% 20% / 0.06);
-  --shadow-xl: 0 16px 32px hsl(182 20% 20% / 0.12), 0 8px 10px -1px hsl(182 20% 20% / 0.06);
-  --shadow-2xl: 0 24px 48px hsl(182 20% 20% / 0.18);
+  --shadow-2xs: 0 1px 2px hsl(160 20% 20% / 0.04);
+  --shadow-xs: 0 1px 3px hsl(160 20% 20% / 0.06);
+  --shadow-sm: 0 1px 3px hsl(160 20% 20% / 0.06), 0 1px 2px -1px hsl(160 20% 20% / 0.06);
+  --shadow: 0 2px 4px hsl(160 20% 20% / 0.06), 0 1px 2px -1px hsl(160 20% 20% / 0.06);
+  --shadow-md: 0 4px 8px hsl(160 20% 20% / 0.08), 0 2px 4px -1px hsl(160 20% 20% / 0.06);
+  --shadow-lg: 0 8px 16px hsl(160 20% 20% / 0.1), 0 4px 6px -1px hsl(160 20% 20% / 0.06);
+  --shadow-xl: 0 16px 32px hsl(160 20% 20% / 0.12), 0 8px 10px -1px hsl(160 20% 20% / 0.06);
+  --shadow-2xl: 0 24px 48px hsl(160 20% 20% / 0.18);
 
+  --tracking-normal: 0em;
   --spacing: 0.25rem;
 
+  /* Fallback for older browsers */
   --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --primary-border: hsl(var(--primary));
-  --secondary-border: hsl(var(--secondary));
-  --muted-border: hsl(var(--muted));
-  --accent-border: hsl(var(--accent));
-  --destructive-border: hsl(var(--destructive));
+  --sidebar-primary-border: hsl(
+    from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
   --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --sidebar-accent-border: hsl(
+    from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --primary-border: hsl(var(--primary));
+  --primary-border: hsl(
+    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --secondary-border: hsl(var(--secondary));
+  --secondary-border: hsl(
+    from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --muted-border: hsl(var(--muted));
+  --muted-border: hsl(
+    from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --accent-border: hsl(var(--accent));
+  --accent-border: hsl(
+    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --destructive-border: hsl(var(--destructive));
+  --destructive-border: hsl(
+    from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 }
 
 /* DARK MODE (default for DCS) */
@@ -86,41 +110,41 @@
   --elevate-1: rgba(255, 255, 255, 0.04);
   --elevate-2: rgba(255, 255, 255, 0.09);
 
-  --background: 182 30% 6%;
+  --background: 160 30% 6%;
   --foreground: 0 0% 93%;
-  --border: 182 15% 18%;
-  --card: 182 25% 9%;
+  --border: 160 15% 18%;
+  --card: 160 25% 9%;
   --card-foreground: 0 0% 93%;
-  --card-border: 182 18% 14%;
+  --card-border: 160 18% 14%;
 
-  --sidebar: 182 22% 8%;
+  --sidebar: 160 22% 8%;
   --sidebar-foreground: 0 0% 93%;
-  --sidebar-border: 182 15% 15%;
-  --sidebar-primary: 182 70% 35%;
+  --sidebar-border: 160 15% 15%;
+  --sidebar-primary: 160 65% 36%;
   --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 182 15% 15%;
+  --sidebar-accent: 160 15% 15%;
   --sidebar-accent-foreground: 0 0% 93%;
-  --sidebar-ring: 182 70% 35%;
+  --sidebar-ring: 160 65% 36%;
 
-  --popover: 182 22% 10%;
+  --popover: 160 22% 10%;
   --popover-foreground: 0 0% 93%;
-  --popover-border: 182 15% 18%;
+  --popover-border: 160 15% 18%;
 
-  --primary: 182 70% 35%;
+  --primary: 160 65% 36%;
   --primary-foreground: 0 0% 98%;
-  --secondary: 182 12% 16%;
+  --secondary: 160 12% 16%;
   --secondary-foreground: 0 0% 93%;
-  --muted: 182 10% 18%;
-  --muted-foreground: 182 6% 55%;
-  --accent: 182 12% 16%;
+  --muted: 160 10% 18%;
+  --muted-foreground: 160 6% 55%;
+  --accent: 160 12% 16%;
   --accent-foreground: 0 0% 93%;
   --destructive: 0 72% 50%;
   --destructive-foreground: 0 0% 98%;
-  --input: 182 12% 25%;
-  --ring: 182 70% 35%;
+  --input: 160 12% 25%;
+  --ring: 160 65% 36%;
 
-  --chart-1: 182 70% 42%;
-  --chart-2: 182 45% 55%;
+  --chart-1: 160 65% 42%;
+  --chart-2: 160 40% 55%;
   --chart-3: 43 74% 65%;
   --chart-4: 200 60% 60%;
   --chart-5: 262 50% 65%;
@@ -134,19 +158,42 @@
   --shadow-xl: 0 16px 32px hsl(0 0% 0% / 0.45), 0 8px 10px -1px hsl(0 0% 0% / 0.2);
   --shadow-2xl: 0 24px 48px hsl(0 0% 0% / 0.5);
 
+  /* Fallback for older browsers */
   --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --primary-border: hsl(var(--primary));
-  --secondary-border: hsl(var(--secondary));
-  --muted-border: hsl(var(--muted));
-  --accent-border: hsl(var(--accent));
-  --destructive-border: hsl(var(--destructive));
+  --sidebar-primary-border: hsl(
+    from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
   --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --sidebar-accent-border: hsl(
+    from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --primary-border: hsl(var(--primary));
+  --primary-border: hsl(
+    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --secondary-border: hsl(var(--secondary));
+  --secondary-border: hsl(
+    from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --muted-border: hsl(var(--muted));
+  --muted-border: hsl(
+    from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --accent-border: hsl(var(--accent));
+  --accent-border: hsl(
+    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --destructive-border: hsl(var(--destructive));
+  --destructive-border: hsl(
+    from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
@@ -205,17 +252,23 @@
   overflow-y: auto;
 }
 
+/* Hamburger — hidden on desktop */
 .dcs-mobile-menu-btn { display: none; }
+
+/* Bottom nav — hidden on desktop */
 .dcs-mobile-bottom-nav { display: none; }
 
+/* ── Mobile: tap targets & scrolling ────────────────────────────────── */
 button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
 * { -webkit-overflow-scrolling: touch; }
 html { height: -webkit-fill-available; }
 body { min-height: -webkit-fill-available; }
 
 @media (max-width: 768px) {
+  /* Hide desktop sidebar */
   .dcs-sidebar { display: none !important; }
 
+  /* Show top bar on mobile */
   .dcs-topbar {
     display: flex !important;
     height: 48px;
@@ -223,6 +276,7 @@ body { min-height: -webkit-fill-available; }
   }
   .dcs-mobile-menu-btn { display: flex !important; }
 
+  /* Bottom navigation */
   .dcs-mobile-bottom-nav {
     display: flex !important;
     position: fixed;
@@ -253,9 +307,84 @@ body { min-height: -webkit-fill-available; }
     color: hsl(var(--primary));
   }
 
+  /* Content area — offset for topbar + bottom nav */
   .dcs-page-content {
     padding-bottom: 72px;
   }
 
+  /* Prevent overflow */
   img, canvas, iframe, video { max-width: 100% !important; }
+}
+
+/* ── Elevation System ────────────────────────────────────────────────────── */
+
+@layer utilities {
+  input[type='search']::-webkit-search-cancel-button {
+    @apply hidden;
+  }
+
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  .no-default-hover-elevate {}
+  .no-default-active-elevate {}
+
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before {
+    background-color: var(--elevate-2);
+  }
+
+  .border.toggle-elevate::before {
+    inset: -1px;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
+    inset: -1px;
+  }
 }
