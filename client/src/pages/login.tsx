@@ -91,7 +91,7 @@ export default function LoginPage() {
         <Card className="border-dashed opacity-60">
           <CardContent className="p-3 text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground/70">Demo accounts</p>
-            <p>Admin: admin@dcs.com / admin123</p>
+            <p>Admin: admin / admin123</p>
             <p>Manager: osm@dcs.com / osm123</p>
             <p>Driver: driver1@dcs.com / driver123</p>
             <p>Client: client@dpd.com / client123</p>

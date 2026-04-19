@@ -524,9 +524,26 @@ export async function registerRoutes(server: Server, app: Express) {
 
   app.post("/api/seed", async (req: Request, res: Response) => {
     try {
-      // Check if already seeded
+      // Check if already seeded — if so, force-reset passwords and return
       const existing = storage.getUserByEmail("admin");
-      if (existing) return res.json({ message: "Already seeded" });
+      if (existing) {
+        const resetAccounts = [
+          { email: "admin", password: "admin123" },
+          { email: "osm@dcs.com", password: "osm123" },
+          { email: "driver1@dcs.com", password: "driver123" },
+          { email: "driver2@dcs.com", password: "driver123" },
+          { email: "driver3@dcs.com", password: "driver123" },
+          { email: "client@dpd.com", password: "client123" },
+        ];
+        for (const acct of resetAccounts) {
+          const u = storage.getUserByEmail(acct.email);
+          if (u) {
+            const hash = await hashPassword(acct.password);
+            storage.updateUser(u.id, { passwordHash: hash } as any);
+          }
+        }
+        return res.json({ message: "Already seeded — passwords reset" });
+      }
 
       const now = new Date().toISOString();
 
