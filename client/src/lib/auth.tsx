@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { apiRequest, setAuthToken, queryClient } from "./queryClient";
 
 export interface AuthUser {
@@ -38,6 +38,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthToken(null);
       setUser(null);
     }
+  }, []);
+
+  // SSO: check for dcs_token query param on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const dcsToken = params.get("dcs_token");
+    if (!dcsToken) return;
+    setIsLoading(true);
+    // Strip token from URL immediately
+    params.delete("dcs_token");
+    const newSearch = params.toString();
+    const newUrl = window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
+    window.history.replaceState({}, "", newUrl);
+    fetch("/api/auth/sso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: dcsToken }),
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          setAuthToken(data.token);
+          setUser(data.user);
+          queryClient.clear();
+        }
+        // On failure, fall through to normal login page
+      })
+      .catch(() => { /* fall through */ })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

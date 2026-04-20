@@ -49,6 +49,42 @@ export async function registerRoutes(server: Server, app: Express) {
   // AUTH
   // ─────────────────────────────────────────────────────────────────────────
 
+  // POST /api/auth/sso — Command Suite SSO token verification
+  app.post("/api/auth/sso", async (req: Request, res: Response) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "token required" });
+
+    try {
+      const verifyRes = await fetch("https://dcs-command-suite-auth-production.up.railway.app/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      if (!verifyRes.ok) return res.status(401).json({ error: "SSO token invalid" });
+
+      const payload = await verifyRes.json() as any;
+      if (!payload?.valid || !payload?.user?.email) {
+        return res.status(401).json({ error: "SSO token invalid" });
+      }
+
+      const ssoUser = payload.user;
+
+      // Find user in local DB by email
+      let user = storage.getUserByEmail(ssoUser.email);
+      if (!user) return res.status(401).json({ error: "No local account for this SSO user" });
+
+      storage.updateUser(user.id, { lastLoginAt: new Date().toISOString() });
+      const localToken = generateToken(user);
+      audit(user.id, "sso_login");
+
+      return res.json({ token: localToken, user: { id: user.id, email: user.email, name: user.name, role: user.role, region: user.region } });
+    } catch (err: any) {
+      console.error("[SSO] Error:", err);
+      return res.status(401).json({ error: "SSO verification failed" });
+    }
+  });
+
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email and password required" });
