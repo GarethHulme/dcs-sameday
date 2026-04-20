@@ -2,11 +2,16 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 const API_BASE = "__PORT_5000__".startsWith("__") ? "" : "__PORT_5000__";
 
-// In-memory auth token (no localStorage in sandboxed iframe)
+// Persist token to localStorage so it survives page refresh and SSO
 let authToken: string | null = null;
+try { authToken = localStorage.getItem("dcs_sameday_token"); } catch { /* SSR / sandbox */ }
 
 export function setAuthToken(token: string | null) {
   authToken = token;
+  try {
+    if (token) localStorage.setItem("dcs_sameday_token", token);
+    else localStorage.removeItem("dcs_sameday_token");
+  } catch { /* ignore */ }
 }
 
 export function getStoredToken(): string | null {

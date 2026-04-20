@@ -117,6 +117,38 @@ export async function registerRoutes(server: Server, app: Express) {
     return res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   });
 
+  // ── SSO: Accept a DCS Command Suite token and issue a local JWT ──
+  app.get("/api/auth/sso", async (req: Request, res: Response) => {
+    try {
+      const { token } = req.query;
+      if (!token || typeof token !== "string") return res.status(400).json({ error: "Token required" });
+      const jwt = await import("jsonwebtoken");
+      // Accept tokens signed with either the command suite secret or local secret
+      const secrets = [
+        process.env.JWT_SECRET || "dcs-sameday-secret-change-in-production",
+        "dcs-roster-secret-change-in-production",
+      ];
+      let payload: any = null;
+      for (const s of secrets) {
+        try { payload = jwt.default.verify(token, s); break; } catch { /* try next */ }
+      }
+      if (!payload) return res.status(401).json({ error: "Invalid SSO token" });
+      // Look up or create user by email
+      let user = storage.getUserByEmail(payload.email);
+      if (!user) {
+        // Auto-provision from SSO
+        const { hashPassword: hp } = await import("./auth");
+        const passwordHash = await hp("sso-provisioned-" + Date.now());
+        user = storage.createUser({ email: payload.email, passwordHash, name: payload.name || payload.email, role: payload.role || "admin" });
+      }
+      const localToken = generateToken(user);
+      const { passwordHash: _, ...safeUser } = user;
+      return res.json({ token: localToken, user: safeUser });
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid or expired SSO token" });
+    }
+  });
+
   app.get("/api/auth/me", authenticate, (req: Request, res: Response) => {
     const user = storage.getUser(req.user!.userId);
     if (!user) return res.status(404).json({ error: "User not found" });

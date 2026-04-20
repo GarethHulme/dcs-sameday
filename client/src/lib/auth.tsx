@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import { apiRequest, setAuthToken, queryClient } from "./queryClient";
+import { apiRequest, setAuthToken, getStoredToken, queryClient } from "./queryClient";
 
 export interface AuthUser {
   id: number;
@@ -25,7 +25,7 @@ const AuthCtx = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!getStoredToken());
 
   const refreshUser = useCallback(async () => {
     try {
@@ -33,6 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setUser(data);
+      } else {
+        setAuthToken(null);
+        setUser(null);
       }
     } catch {
       setAuthToken(null);
@@ -40,34 +43,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // SSO: check for dcs_token query param on mount
+  // Auto-restore session from stored token on mount, or SSO token from URL
+  // Supports both ?sso= (command suite) and ?dcs_token= (legacy) param names
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const dcsToken = params.get("dcs_token");
-    if (!dcsToken) return;
-    setIsLoading(true);
-    // Strip token from URL immediately
-    params.delete("dcs_token");
-    const newSearch = params.toString();
-    const newUrl = window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
-    window.history.replaceState({}, "", newUrl);
-    fetch("/api/auth/sso", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: dcsToken }),
-    })
-      .then(async (res) => {
-        if (res.ok) {
-          const data = await res.json();
+    const ssoToken = params.get("sso") || params.get("dcs_token");
+    if (ssoToken) {
+      setIsLoading(true);
+      // Strip SSO token from URL immediately
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete("sso");
+      clean.searchParams.delete("dcs_token");
+      window.history.replaceState({}, "", clean.pathname + clean.search);
+      // Exchange SSO token for a local JWT
+      fetch(`/api/auth/sso?token=${encodeURIComponent(ssoToken)}`)
+        .then(res => res.ok ? res.json() : Promise.reject(new Error("SSO failed")))
+        .then(data => {
           setAuthToken(data.token);
           setUser(data.user);
           queryClient.clear();
-        }
-        // On failure, fall through to normal login page
-      })
-      .catch(() => { /* fall through */ })
-      .finally(() => setIsLoading(false));
-  }, []);
+        })
+        .catch(async () => {
+          // SSO failed — fall back to stored token if available
+          if (getStoredToken()) await refreshUser();
+        })
+        .finally(() => setIsLoading(false));
+    } else if (getStoredToken()) {
+      refreshUser().finally(() => setIsLoading(false));
+    }
+  }, [refreshUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
