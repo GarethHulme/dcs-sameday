@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from "react";
 import { useAuth, type AuthUser } from "@/lib/auth";
+import DCSModuleNav from "@/components/DCSModuleNav";
 import { useTheme } from "@/lib/theme";
 import { Link, useLocation } from "wouter";
 import {
@@ -104,7 +105,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const unread = (alerts as any[]).filter(a => !a.read).length;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }} className="bg-background">
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }} className="bg-background">
+      <DCSModuleNav currentModule="same_day" />
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
       {/* ── Desktop Sidebar ────────────────────────────────── */}
       <aside className="dcs-sidebar" style={{ display: "flex", flexDirection: "column" }}>
         {/* Logo */}
@@ -242,6 +245,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+      </div>
       </div>
     </div>
   );
