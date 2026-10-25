@@ -51,7 +51,7 @@ const LIVE_MODULES: ModuleEntry[] = [
     key: "roster_control",
     label: "Roster & Control",
     shortLabel: "Roster",
-    url: "https://dcs-roster-production.up.railway.app/",
+    url: "https://dcs-roster-hardened-production.up.railway.app/",
     // CalendarCheck icon
     icon: "M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM16 2v4M8 2v4M3 10h18m-9 4l2 2 4-4",
   },
@@ -62,6 +62,14 @@ const LIVE_MODULES: ModuleEntry[] = [
     url: "https://dcs-sameday-production.up.railway.app/",
     // Clock icon
     icon: "M12 2a10 10 0 100 20 10 10 0 000-20zm0 4v6l4 2",
+  },
+  {
+    key: "engage",
+    label: "Engage",
+    shortLabel: "Engage",
+    url: "https://dcs-engage-production.up.railway.app/",
+    // MessageCircle icon
+    icon: "M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z",
   },
 ];
 
