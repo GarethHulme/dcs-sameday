@@ -1,3 +1,4 @@
+import SameDayVoice from './components/module-voice/SameDayVoice';
 import { Switch, Route, Router, Redirect } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
 import { queryClient } from "./lib/queryClient";
@@ -29,6 +30,7 @@ function ProtectedRoutes() {
 
   return (
     <AppLayout>
+      <SameDayVoice />
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/jobs" component={JobsPage} />
