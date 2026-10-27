@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/lib/theme";
 import AppLayout from "@/components/app-layout";
 import LoginPage from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
+import DispatchPage from "@/pages/dispatch";
 import JobsPage from "@/pages/jobs";
 import PostJobPage from "@/pages/post-job";
 import PoolPage from "@/pages/pool";
@@ -32,7 +33,12 @@ function ProtectedRoutes() {
     <AppLayout>
       <SameDayVoice />
       <Switch>
-        <Route path="/" component={Dashboard} />
+        <Route path="/">
+          {user.role === "osm" || user.role === "admin" ? <Redirect to="/dispatch" /> : <Dashboard />}
+        </Route>
+        <Route path="/dispatch">
+          {user.role === "osm" || user.role === "admin" ? <DispatchPage /> : <Dashboard />}
+        </Route>
         <Route path="/jobs" component={JobsPage} />
         <Route path="/jobs/new" component={PostJobPage} />
         <Route path="/pool" component={PoolPage} />
