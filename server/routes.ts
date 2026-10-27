@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 10055)
-Total output lines: 866
-
 import { type Express, type Request, type Response } from "express";
 import { type Server } from "http";
 import { storage } from "./storage";
@@ -305,6 +302,22 @@ export async function registerRoutes(server: Server, app: Express) {
     return res.json(updated);
   });
 
+  app.patch("/api/jobs/:id/stops/order", authenticate, requireRole("osm", "admin"), (req: Request, res: Response) => {
+    const id = parseInt(req.params.id as string);
+    const job = storage.getJob(id);
+    if (!job) return res.status(404).json({ error: "Booking not found" });
+    if (job.status !== "open") return res.status(409).json({ error: "Stop order is locked after a driver accepts the booking" });
+    const stopIds = req.body?.stopIds;
+    if (!Array.isArray(stopIds) || stopIds.some((stopId: any) => !Number.isInteger(stopId)) || new Set(stopIds).size !== stopIds.length) {
+      return res.status(400).json({ error: "Provide each stop ID once in the requested order" });
+    }
+    const before = storage.getStopsByJobId(id);
+    const updated = storage.reorderJobStops(id, stopIds);
+    if (!updated) return res.status(400).json({ error: "The stop list changed. Refresh the booking and try again." });
+    audit(req.user!.userId, "reorder_job_stops", "job", id, before, updated);
+    return res.json(updated);
+  });
+
   app.post("/api/jobs/:id/claim", authenticate, requireRole("driver"), (req: Request, res: Response) => {
     const id = parseInt(req.params.id as string);
     const job = storage.getJob(id);
@@ -437,7 +450,14 @@ export async function registerRoutes(server: Server, app: Express) {
         channel: "in_app",
         expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
       });
-      notifications.…55 tokens truncated…ti-drop" : "single-drop"} job is available in ${job.region} on ${job.date}`,
+      notifications.push(notif);
+
+      // Create in-app alert
+      storage.createAlert({
+        type: "new_job",
+        priority: "info",
+        title: "New Job Available",
+        message: `A new ${job.jobType === "multi_drop" ? "multi-drop" : "single-drop"} job is available in ${job.region} on ${job.date}`,
         recipientUserId: pd.userId,
       });
     }

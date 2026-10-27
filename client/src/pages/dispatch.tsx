@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
   Activity, AlertTriangle, ArrowRight, Check, Clock3, MapPin, Package,
-  Plus, RefreshCw, Search, Truck, Users, Zap,
+  ListOrdered, MoveDown, MoveUp, Plus, RefreshCw, Search, Truck, Users, Zap,
 } from "lucide-react";
 
 type Job = {
@@ -19,7 +19,7 @@ type Job = {
   departureTime?: string | null; estimatedStops?: number | null; estimatedHours?: number | null;
   payRate?: number | null; postcodes?: string | null; claimedByDriverId?: number | null;
   clientUserId?: number | null;
-  stops?: Array<{ sequence: number; postcode: string; city: string; status: string }>;
+  stops?: Array<{ id: number; sequence: number; addressLine1: string; addressLine2?: string | null; postcode: string; city: string; status: string }>;
 };
 
 type PoolDriver = { id: number; userId: number; status: string; complianceStatus: string; region?: string | null };
@@ -46,6 +46,8 @@ export default function DispatchPage() {
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState("all");
   const [assigning, setAssigning] = useState<Job | null>(null);
+  const [planning, setPlanning] = useState<Job | null>(null);
+  const [routeOrder, setRouteOrder] = useState<number[]>([]);
   const [driverId, setDriverId] = useState("");
   const { data: jobs = [], isLoading, isFetching, refetch } = useQuery<Job[]>({ queryKey: ["/api/jobs"] });
   const { data: pool = [] } = useQuery<PoolDriver[]>({ queryKey: ["/api/pool"] });
@@ -75,6 +77,15 @@ export default function DispatchPage() {
       toast({ title: "Driver assigned", description: "The booking has been updated." });
     },
     onError: (error: any) => toast({ variant: "destructive", title: "Could not assign driver", description: error?.message ?? "Please try again." }),
+  });
+  const saveStopOrder = useMutation({
+    mutationFn: ({ id, stopIds }: { id: number; stopIds: number[] }) => apiRequest("PATCH", `/api/jobs/${id}/stops/order`, { stopIds }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/jobs"] });
+      setPlanning(null);
+      toast({ title: "Stop order saved", description: "The driver will see this sequence." });
+    },
+    onError: (error: any) => toast({ variant: "destructive", title: "Could not save stop order", description: error?.message ?? "Refresh the booking and try again." }),
   });
 
   return (
@@ -157,9 +168,14 @@ export default function DispatchPage() {
                           <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" />{assignedDriver?.name || "No driver yet"}</span>
                         </div>
                         {job.payRate != null && <div className="border-t border-slate-100 pt-2 text-xs text-slate-500">Driver pay <strong className="ml-1 font-semibold text-slate-800">£{job.payRate}</strong></div>}
-                        {job.status === "open" && <Button size="sm" variant="outline" className="h-8 w-full border-slate-300 text-xs" onClick={() => { setAssigning(job); setDriverId(""); }}>
-                          <Zap className="mr-1.5 h-3.5 w-3.5" /> Assign eligible driver
-                        </Button>}
+                        {job.status === "open" && <div className="grid grid-cols-2 gap-2">
+                          {!!job.stops?.length && <Button size="sm" variant="outline" className="h-8 border-slate-300 text-xs" onClick={() => { setPlanning(job); setRouteOrder(job.stops!.map(stop => stop.id)); }}>
+                            <ListOrdered className="mr-1 h-3.5 w-3.5" /> Plan order
+                          </Button>}
+                          <Button size="sm" variant="outline" className="h-8 border-slate-300 text-xs" onClick={() => { setAssigning(job); setDriverId(""); }}>
+                            <Zap className="mr-1 h-3.5 w-3.5" /> Assign driver
+                          </Button>
+                        </div>}
                       </CardContent>
                     </Card>;
                   })}
@@ -194,6 +210,48 @@ export default function DispatchPage() {
             <Button variant="outline" onClick={() => setAssigning(null)}>Cancel</Button>
             <Button disabled={!driverId || assignJob.isPending} onClick={() => assigning && assignJob.mutate({ id: assigning.id, driver: Number(driverId) })}>
               {assignJob.isPending ? "Assigning…" : "Confirm assignment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!planning} onOpenChange={open => { if (!open) setPlanning(null); }}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
+          <DialogHeader><DialogTitle>Plan stop order</DialogTitle></DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <p className="text-sm font-medium text-slate-900">{planning?.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Set the sequence the driver should follow. Drivr-Sameday does not yet calculate the fastest route.</p>
+            </div>
+            <ol className="space-y-2">
+              {routeOrder.map((stopId, index) => {
+                const stop = planning?.stops?.find(item => item.id === stopId);
+                if (!stop) return null;
+                return <li key={stopId} className="flex items-center gap-3 rounded-lg border bg-white p-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold">{index + 1}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{stop.addressLine1}{stop.addressLine2 ? `, ${stop.addressLine2}` : ""}</p>
+                    <p className="text-xs text-muted-foreground">{stop.city} · {stop.postcode}</p>
+                  </div>
+                  <div className="flex shrink-0">
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Move stop ${index + 1} up`} disabled={index === 0} onClick={() => setRouteOrder(current => {
+                      const next = current.slice();
+                      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                      return next;
+                    })}><MoveUp className="h-4 w-4" /></Button>
+                    <Button type="button" variant="ghost" size="icon" aria-label={`Move stop ${index + 1} down`} disabled={index === routeOrder.length - 1} onClick={() => setRouteOrder(current => {
+                      const next = current.slice();
+                      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                      return next;
+                    })}><MoveDown className="h-4 w-4" /></Button>
+                  </div>
+                </li>;
+              })}
+            </ol>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPlanning(null)}>Cancel</Button>
+            <Button disabled={!planning || saveStopOrder.isPending || routeOrder.length < 1} onClick={() => planning && saveStopOrder.mutate({ id: planning.id, stopIds: routeOrder })}>
+              {saveStopOrder.isPending ? "Saving…" : "Save stop order"}
             </Button>
           </DialogFooter>
         </DialogContent>

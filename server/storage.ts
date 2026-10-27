@@ -65,6 +65,7 @@ export interface IStorage {
   getStopsByJobId(jobId: number): SameDayStop[];
   getStopsByJobIds(jobIds: number[]): SameDayStop[];
   createJobStops(jobId: number, stops: Array<Omit<InsertSameDayStop, "id" | "jobId" | "sequence">>): SameDayStop[];
+  reorderJobStops(jobId: number, stopIds: number[]): SameDayStop[] | undefined;
 
   // Pool drivers
   getPoolDriver(id: number): AdhocPoolDriver | undefined;
@@ -177,6 +178,24 @@ export class SqliteStorage implements IStorage {
       jobId,
       sequence: index + 1,
     }))).returning().all();
+  }
+  reorderJobStops(jobId: number, stopIds: number[]): SameDayStop[] | undefined {
+    const existing = this.getStopsByJobId(jobId);
+    const existingIds = existing.map(stop => stop.id).sort((a, b) => a - b);
+    const requestedIds = [...stopIds].sort((a, b) => a - b);
+    if (existingIds.length !== requestedIds.length || existingIds.some((id, index) => id !== requestedIds[index])) return undefined;
+
+    return db.transaction(() => {
+      for (const stop of existing) {
+        db.update(sameDayStops).set({ sequence: -stop.id, updatedAt: new Date().toISOString() })
+          .where(and(eq(sameDayStops.id, stop.id), eq(sameDayStops.jobId, jobId))).run();
+      }
+      stopIds.forEach((stopId, index) => {
+        db.update(sameDayStops).set({ sequence: index + 1, updatedAt: new Date().toISOString() })
+          .where(and(eq(sameDayStops.id, stopId), eq(sameDayStops.jobId, jobId))).run();
+      });
+      return this.getStopsByJobId(jobId);
+    });
   }
 
   // ── Pool Drivers ──
