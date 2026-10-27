@@ -178,7 +178,7 @@ export default function RegisterPoolPage() {
             <div className="space-y-4">
               <div className="rounded-lg border p-4 text-sm space-y-2 text-muted-foreground max-h-48 overflow-y-auto">
                 <p className="font-semibold text-foreground">Terms & Conditions</p>
-                <p>By joining the DCS Same Day Ad-Hoc Pool, you agree to:</p>
+                <p>By joining the Drivr-Sameday driver pool, you agree to:</p>
                 <ul className="list-disc pl-4 space-y-1">
                   <li>Maintain valid insurance, driving licence and right to work documentation</li>
                   <li>Complete accepted jobs professionally and punctually</li>

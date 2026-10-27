@@ -60,6 +60,30 @@ export function initializeDatabase() {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     )`);
 
+    db.run(sql`CREATE TABLE IF NOT EXISTS same_day_stops (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      job_id INTEGER NOT NULL REFERENCES same_day_jobs(id),
+      sequence INTEGER NOT NULL,
+      stop_type TEXT NOT NULL DEFAULT 'delivery',
+      address_line1 TEXT NOT NULL,
+      address_line2 TEXT,
+      city TEXT NOT NULL,
+      postcode TEXT NOT NULL,
+      recipient_name TEXT,
+      recipient_phone TEXT,
+      instructions TEXT,
+      parcel_count INTEGER,
+      window_start TEXT,
+      window_end TEXT,
+      latitude REAL,
+      longitude REAL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      completed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(job_id, sequence)
+    )`);
+
     db.run(sql`CREATE TABLE IF NOT EXISTS adhoc_pool_drivers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL REFERENCES users(id),

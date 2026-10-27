@@ -19,6 +19,7 @@ type Job = {
   departureTime?: string | null; estimatedStops?: number | null; estimatedHours?: number | null;
   payRate?: number | null; postcodes?: string | null; claimedByDriverId?: number | null;
   clientUserId?: number | null;
+  stops?: Array<{ sequence: number; postcode: string; city: string; status: string }>;
 };
 
 type PoolDriver = { id: number; userId: number; status: string; complianceStatus: string; region?: string | null };
@@ -151,8 +152,8 @@ export default function DispatchPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-y-2 text-xs text-slate-500">
                           <span className="flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5" />{job.departureTime || "Time TBC"}</span>
-                          <span className="flex items-center gap-1.5"><Package className="h-3.5 w-3.5" />{job.estimatedStops ?? "—"} stops</span>
-                          <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{job.postcodes || "Route details TBC"}</span>
+                          <span className="flex items-center gap-1.5"><Package className="h-3.5 w-3.5" />{job.stops?.length ?? job.estimatedStops ?? "—"} stops</span>
+                          <span className="flex min-w-0 items-center gap-1.5"><MapPin className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{job.stops?.length ? `${job.stops[0].postcode}${job.stops.length > 1 ? ` + ${job.stops.length - 1} stops` : ""}` : (job.postcodes || "Route details TBC")}</span></span>
                           <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" />{assignedDriver?.name || "No driver yet"}</span>
                         </div>
                         {job.payRate != null && <div className="border-t border-slate-100 pt-2 text-xs text-slate-500">Driver pay <strong className="ml-1 font-semibold text-slate-800">£{job.payRate}</strong></div>}

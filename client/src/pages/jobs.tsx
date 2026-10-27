@@ -204,7 +204,7 @@ export default function JobsPage() {
                       </Button>
                     </>
                   )}
-                  {(isManager || (isDriver && job.claimedByDriverId === user?.id)) && ["claimed", "assigned", "in_progress"].includes(job.status) && (
+                  {(isManager && ["claimed", "assigned", "in_progress"].includes(job.status) || isDriver && job.claimedByDriverId === user?.id && job.status === "in_progress") && (
                     <Button size="sm" className="flex-1" variant="outline" onClick={() => completeJob.mutate(job.id)}>
                       Complete
                     </Button>
