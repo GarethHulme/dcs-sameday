@@ -2,6 +2,7 @@ import {
   type User, type InsertUser, users,
   type Site, type InsertSite, sites,
   type SameDayJob, type InsertSameDayJob, sameDayJobs,
+  type SameDayStop, type InsertSameDayStop, sameDayStops,
   type AdhocPoolDriver, type InsertAdhocPoolDriver, adhocPoolDrivers,
   type SameDayContract, type InsertSameDayContract, sameDayContracts,
   type JobPushNotification, jobPushNotifications,
@@ -10,7 +11,7 @@ import {
 } from "@shared/schema";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
-import { eq, and, gte, lte, desc, asc, sql, or } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, sql, or, inArray } from "drizzle-orm";
 import path from "path";
 import fs from "fs";
 
@@ -61,6 +62,10 @@ export interface IStorage {
   getJobsByDriver(driverId: number): SameDayJob[];
   createJob(job: InsertSameDayJob): SameDayJob;
   updateJob(id: number, data: Partial<SameDayJob>): SameDayJob | undefined;
+  getStopsByJobId(jobId: number): SameDayStop[];
+  getStopsByJobIds(jobIds: number[]): SameDayStop[];
+  createJobStops(jobId: number, stops: Array<Omit<InsertSameDayStop, "id" | "jobId" | "sequence">>): SameDayStop[];
+  reorderJobStops(jobId: number, stopIds: number[]): SameDayStop[] | undefined;
 
   // Pool drivers
   getPoolDriver(id: number): AdhocPoolDriver | undefined;
@@ -152,6 +157,45 @@ export class SqliteStorage implements IStorage {
   }
   updateJob(id: number, data: Partial<SameDayJob>): SameDayJob | undefined {
     return db.update(sameDayJobs).set({ ...data, updatedAt: new Date().toISOString() }).where(eq(sameDayJobs.id, id)).returning().get();
+  }
+  getStopsByJobId(jobId: number): SameDayStop[] {
+    return db.select().from(sameDayStops).where(eq(sameDayStops.jobId, jobId)).orderBy(asc(sameDayStops.sequence)).all();
+  }
+  getStopsByJobIds(jobIds: number[]): SameDayStop[] {
+    if (jobIds.length === 0) return [];
+    const rows: SameDayStop[] = [];
+    for (let start = 0; start < jobIds.length; start += 500) {
+      const batch = jobIds.slice(start, start + 500);
+      rows.push(...db.select().from(sameDayStops).where(inArray(sameDayStops.jobId, batch))
+        .orderBy(asc(sameDayStops.jobId), asc(sameDayStops.sequence)).all());
+    }
+    return rows;
+  }
+  createJobStops(jobId: number, stops: Array<Omit<InsertSameDayStop, "id" | "jobId" | "sequence">>): SameDayStop[] {
+    if (stops.length === 0) return [];
+    return db.insert(sameDayStops).values(stops.map((stop, index) => ({
+      ...stop,
+      jobId,
+      sequence: index + 1,
+    }))).returning().all();
+  }
+  reorderJobStops(jobId: number, stopIds: number[]): SameDayStop[] | undefined {
+    const existing = this.getStopsByJobId(jobId);
+    const existingIds = existing.map(stop => stop.id).sort((a, b) => a - b);
+    const requestedIds = [...stopIds].sort((a, b) => a - b);
+    if (existingIds.length !== requestedIds.length || existingIds.some((id, index) => id !== requestedIds[index])) return undefined;
+
+    return db.transaction(() => {
+      for (const stop of existing) {
+        db.update(sameDayStops).set({ sequence: -stop.id, updatedAt: new Date().toISOString() })
+          .where(and(eq(sameDayStops.id, stop.id), eq(sameDayStops.jobId, jobId))).run();
+      }
+      stopIds.forEach((stopId, index) => {
+        db.update(sameDayStops).set({ sequence: index + 1, updatedAt: new Date().toISOString() })
+          .where(and(eq(sameDayStops.id, stopId), eq(sameDayStops.jobId, jobId))).run();
+      });
+      return this.getStopsByJobId(jobId);
+    });
   }
 
   // ── Pool Drivers ──

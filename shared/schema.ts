@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, unique } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
@@ -97,6 +97,35 @@ export const sameDayJobs = sqliteTable("same_day_jobs", {
 export type SameDayJob = typeof sameDayJobs.$inferSelect;
 export type InsertSameDayJob = typeof sameDayJobs.$inferInsert;
 export const insertJobSchema = createInsertSchema(sameDayJobs);
+
+// One row per physical collection or delivery point. Legacy postcode summaries
+// stay on the job for older clients while new work uses this structured model.
+export const sameDayStops = sqliteTable("same_day_stops", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jobId: integer("job_id").notNull().references(() => sameDayJobs.id),
+  sequence: integer("sequence").notNull(),
+  stopType: text("stop_type").notNull().default("delivery"),
+  addressLine1: text("address_line1").notNull(),
+  addressLine2: text("address_line2"),
+  city: text("city").notNull(),
+  postcode: text("postcode").notNull(),
+  recipientName: text("recipient_name"),
+  recipientPhone: text("recipient_phone"),
+  instructions: text("instructions"),
+  parcelCount: integer("parcel_count"),
+  windowStart: text("window_start"),
+  windowEnd: text("window_end"),
+  latitude: real("latitude"),
+  longitude: real("longitude"),
+  status: text("status").notNull().default("pending"),
+  completedAt: text("completed_at"),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+  updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
+}, (table) => ({ jobSequence: unique().on(table.jobId, table.sequence) }));
+
+export type SameDayStop = typeof sameDayStops.$inferSelect;
+export type InsertSameDayStop = typeof sameDayStops.$inferInsert;
+export const insertStopSchema = createInsertSchema(sameDayStops);
 
 // ─── ADHOC POOL DRIVERS ───────────────────────────────────────────────────────
 

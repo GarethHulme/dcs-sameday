@@ -40,9 +40,8 @@ function getNavItems(user: AuthUser): NavItem[] {
   }
   // osm / admin
   return [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "Job Board", href: "/jobs", icon: Briefcase },
-    { label: "Post Job", href: "/jobs/new", icon: Zap },
+    { label: "Dispatch", href: "/dispatch", icon: LayoutDashboard },
+    { label: "Bookings", href: "/jobs", icon: Briefcase },
     { label: "Driver Pool", href: "/pool", icon: Users },
     { label: "Contracts", href: "/contracts", icon: FileText },
     { label: "Alerts", href: "/alerts", icon: Bell },
@@ -70,7 +69,7 @@ function getMobileNavItems(user: AuthUser): NavItem[] {
     ];
   }
   return [
-    { label: "Home", href: "/", icon: LayoutDashboard },
+    { label: "Dispatch", href: "/dispatch", icon: LayoutDashboard },
     { label: "Jobs", href: "/jobs", icon: Briefcase },
     { label: "Pool", href: "/pool", icon: Users },
     { label: "Contracts", href: "/contracts", icon: FileText },
@@ -117,8 +116,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <path d="M54 4 C54 4 44 4 36 14 C32 19 32 26 32 26 C32 26 32 33 36 38 C44 48 54 48 54 48" stroke="hsl(var(--primary))" strokeWidth="7" fill="none" strokeLinecap="round" />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-sidebar-foreground leading-tight">Same Day</p>
-            <p style={{ fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 3 }} className="text-muted-foreground">DCS Command Suite</p>
+            <p className="text-sm font-semibold text-sidebar-foreground leading-tight">Drivr-Sameday</p>
+            <p style={{ fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", marginTop: 3 }} className="text-muted-foreground">Operations workspace</p>
           </div>
         </div>
 
@@ -174,7 +173,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)" }} onClick={() => setMobileMenuOpen(false)} />
           <aside style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: 220, background: "hsl(var(--sidebar))", display: "flex", flexDirection: "column", zIndex: 310 }}>
             <div style={{ padding: "16px", borderBottom: "1px solid hsl(var(--sidebar-border))", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <p className="text-sm font-semibold">DCS Same Day</p>
+              <p className="text-sm font-semibold">Drivr-Sameday</p>
               <button onClick={() => setMobileMenuOpen(false)}>
                 <X size={16} className="text-muted-foreground" />
               </button>
@@ -215,7 +214,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <path d="M4 4 C4 4 14 4 22 14 C26 19 26 26 26 26 C26 26 26 33 22 38 C14 48 4 48 4 48" stroke="currentColor" strokeWidth="7" fill="none" strokeLinecap="round" />
               <path d="M54 4 C54 4 44 4 36 14 C32 19 32 26 32 26 C32 26 32 33 36 38 C44 48 54 48 54 48" stroke="hsl(var(--primary))" strokeWidth="7" fill="none" strokeLinecap="round" />
             </svg>
-            <span className="text-sm font-semibold">Same Day</span>
+            <span className="text-sm font-semibold">Drivr-Sameday</span>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             <button onClick={toggle}>

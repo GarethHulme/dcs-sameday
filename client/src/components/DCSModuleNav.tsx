@@ -57,8 +57,8 @@ const LIVE_MODULES: ModuleEntry[] = [
   },
   {
     key: "same_day",
-    label: "Same Day",
-    shortLabel: "Same Day",
+    label: "Drivr-Sameday",
+    shortLabel: "Sameday",
     url: "https://dcs-sameday-production.up.railway.app/",
     // Clock icon
     icon: "M12 2a10 10 0 100 20 10 10 0 000-20zm0 4v6l4 2",

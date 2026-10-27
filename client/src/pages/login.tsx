@@ -36,8 +36,8 @@ export default function LoginPage() {
             <path d="M54 4 C54 4 44 4 36 14 C32 19 32 26 32 26 C32 26 32 33 36 38 C44 48 54 48 54 48" stroke="hsl(var(--primary))" strokeWidth="7" fill="none" strokeLinecap="round" />
           </svg>
           <div className="text-center">
-            <h1 className="text-lg font-semibold tracking-tight">Same Day</h1>
-            <p className="text-sm text-muted-foreground">DCS Command Suite</p>
+            <h1 className="text-lg font-semibold tracking-tight">Drivr-Sameday</h1>
+            <p className="text-sm text-muted-foreground">Same-day delivery operations</p>
           </div>
         </div>
 

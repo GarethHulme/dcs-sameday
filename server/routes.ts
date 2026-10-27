@@ -17,12 +17,12 @@ function audit(userId: number | undefined, action: string, entity?: string, id?:
 }
 
 function generateContractTerms(job: any, driver: any, client: any): string {
-  return `DCS SAME DAY AD-HOC DRIVER AGREEMENT
+  return `DRIVR-SAMEDAY DRIVER AGREEMENT
 
 Date: ${new Date().toLocaleDateString("en-GB")}
 
 PARTIES:
-- DCS Command Suite (Operator)
+- DCS Logistics (Operator)
 - Client: ${client?.name ?? "Client"}
 - Driver: ${driver?.name ?? "Driver"}
 
@@ -42,6 +42,39 @@ TERMS:
 6. DCS reserves the right to cancel this engagement with reasonable notice.
 
 By accepting this contract, all parties confirm agreement to the above terms.`;
+}
+
+function parseBookingStops(input: any): Array<{
+  stopType: string; addressLine1: string; addressLine2?: string | null; city: string; postcode: string;
+  recipientName?: string | null; recipientPhone?: string | null; instructions?: string | null;
+  parcelCount?: number | null; windowStart?: string | null; windowEnd?: string | null;
+}> | null {
+  if (input === undefined) return null;
+  if (!Array.isArray(input) || input.length > 500) throw new Error("Stops must be a list of no more than 500 addresses");
+  if (input.length === 0) throw new Error("Add at least one stop to the booking");
+  const stops = input.map((stop: any) => ({
+    stopType: stop?.stopType === "collection" ? "collection" : "delivery",
+    addressLine1: String(stop?.addressLine1 ?? "").trim(),
+    addressLine2: String(stop?.addressLine2 ?? "").trim() || null,
+    city: String(stop?.city ?? "").trim(),
+    postcode: String(stop?.postcode ?? "").trim().toUpperCase(),
+    recipientName: String(stop?.recipientName ?? "").trim() || null,
+    recipientPhone: String(stop?.recipientPhone ?? "").trim() || null,
+    instructions: String(stop?.instructions ?? "").trim() || null,
+    parcelCount: stop?.parcelCount === "" || stop?.parcelCount == null ? null : Number(stop.parcelCount),
+    windowStart: String(stop?.windowStart ?? "").trim() || null,
+    windowEnd: String(stop?.windowEnd ?? "").trim() || null,
+  }));
+  if (stops.some(stop => !stop.addressLine1 || !stop.city || !stop.postcode)) {
+    throw new Error("Every stop needs an address, town or city, and postcode");
+  }
+  if (stops.some(stop => stop.parcelCount !== null && (!Number.isInteger(stop.parcelCount) || stop.parcelCount < 0))) {
+    throw new Error("Parcel counts must be whole numbers of zero or more");
+  }
+  if (stops.some(stop => stop.windowStart && stop.windowEnd && stop.windowEnd < stop.windowStart)) {
+    throw new Error("A stop's delivery window must end after it starts");
+  }
+  return stops;
 }
 
 export async function registerRoutes(server: Server, app: Express) {
@@ -187,12 +220,32 @@ export async function registerRoutes(server: Server, app: Express) {
       jobs = jobs.filter(j => j.clientUserId === user.userId);
     }
 
-    return res.json(jobs);
+    const stopRows = storage.getStopsByJobIds(jobs.map(job => job.id));
+    const stopsByJob = new Map<number, typeof stopRows>();
+    for (const stop of stopRows) {
+      const current = stopsByJob.get(stop.jobId) ?? [];
+      current.push(stop);
+      stopsByJob.set(stop.jobId, current);
+    }
+    return res.json(jobs.map(job => {
+      const maySeeFullStops = user.role !== "driver" || job.claimedByDriverId === user.userId;
+      return { ...job, stops: maySeeFullStops ? (stopsByJob.get(job.id) ?? []) : [] };
+    }));
   });
 
   app.post("/api/jobs", authenticate, requireRole("osm", "admin", "client"), async (req: Request, res: Response) => {
     const { title, description, jobType, region, date, estimatedStops, estimatedParcels, estimatedHours, payRate, additionalPayNotes, postcodes, departureTime, siteId } = req.body;
     if (!title || !region || !date) return res.status(400).json({ error: "Title, region and date required" });
+
+    let stops;
+    try {
+      stops = parseBookingStops(req.body.stops);
+      if (jobType === "single_drop" && stops && stops.length !== 1) {
+        throw new Error("A single-drop booking must contain exactly one stop");
+      }
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
 
     const job = storage.createJob({
       title, description, jobType: jobType || "multi_drop",
@@ -208,6 +261,7 @@ export async function registerRoutes(server: Server, app: Express) {
       clientUserId: req.user!.role === "client" ? req.user!.userId : (req.body.clientUserId ?? null),
       status: "open",
     });
+    const savedStops = stops ? storage.createJobStops(job.id, stops) : [];
 
     // Auto-generate contract draft
     const client = req.user!.role === "client" ? storage.getUser(req.user!.userId) : null;
@@ -221,13 +275,22 @@ export async function registerRoutes(server: Server, app: Express) {
     });
 
     audit(req.user!.userId, "create_job", "job", job.id, null, job);
-    return res.status(201).json(job);
+    return res.status(201).json({ ...job, stops: savedStops });
   });
 
   app.get("/api/jobs/:id", authenticate, (req: Request, res: Response) => {
     const job = storage.getJob(parseInt(req.params.id as string));
     if (!job) return res.status(404).json({ error: "Job not found" });
-    return res.json(job);
+    const user = req.user!;
+    if (user.role === "client" && job.clientUserId !== user.userId) return res.status(404).json({ error: "Job not found" });
+    if (user.role === "driver") {
+      const driver = storage.getUser(user.userId);
+      const isAssignedDriver = job.claimedByDriverId === user.userId;
+      const isVisibleOpenJob = job.status === "open" && (!driver?.region || driver.region === job.region);
+      if (!isAssignedDriver && !isVisibleOpenJob) return res.status(404).json({ error: "Job not found" });
+      return res.json({ ...job, stops: isAssignedDriver ? storage.getStopsByJobId(job.id) : [] });
+    }
+    return res.json({ ...job, stops: storage.getStopsByJobId(job.id) });
   });
 
   app.patch("/api/jobs/:id", authenticate, requireRole("osm", "admin"), (req: Request, res: Response) => {
@@ -236,6 +299,22 @@ export async function registerRoutes(server: Server, app: Express) {
     if (!job) return res.status(404).json({ error: "Job not found" });
     const updated = storage.updateJob(id, req.body);
     audit(req.user!.userId, "update_job", "job", id, job, updated);
+    return res.json(updated);
+  });
+
+  app.patch("/api/jobs/:id/stops/order", authenticate, requireRole("osm", "admin"), (req: Request, res: Response) => {
+    const id = parseInt(req.params.id as string);
+    const job = storage.getJob(id);
+    if (!job) return res.status(404).json({ error: "Booking not found" });
+    if (job.status !== "open") return res.status(409).json({ error: "Stop order is locked after a driver accepts the booking" });
+    const stopIds = req.body?.stopIds;
+    if (!Array.isArray(stopIds) || stopIds.some((stopId: any) => !Number.isInteger(stopId)) || new Set(stopIds).size !== stopIds.length) {
+      return res.status(400).json({ error: "Provide each stop ID once in the requested order" });
+    }
+    const before = storage.getStopsByJobId(id);
+    const updated = storage.reorderJobStops(id, stopIds);
+    if (!updated) return res.status(400).json({ error: "The stop list changed. Refresh the booking and try again." });
+    audit(req.user!.userId, "reorder_job_stops", "job", id, before, updated);
     return res.json(updated);
   });
 
@@ -297,12 +376,27 @@ export async function registerRoutes(server: Server, app: Express) {
     return res.json(updated);
   });
 
+  app.post("/api/jobs/:id/start", authenticate, requireRole("driver"), (req: Request, res: Response) => {
+    const id = parseInt(req.params.id as string);
+    const job = storage.getJob(id);
+    if (!job) return res.status(404).json({ error: "Job not found" });
+    if (job.claimedByDriverId !== req.user!.userId) return res.status(403).json({ error: "This booking is not assigned to you" });
+    if (!["claimed", "assigned"].includes(job.status)) return res.status(400).json({ error: "This booking cannot be started from its current status" });
+
+    const updated = storage.updateJob(id, { status: "in_progress" });
+    audit(req.user!.userId, "start_job", "job", id, job, updated);
+    return res.json(updated);
+  });
+
   app.post("/api/jobs/:id/complete", authenticate, (req: Request, res: Response) => {
     const id = parseInt(req.params.id as string);
     const job = storage.getJob(id);
     if (!job) return res.status(404).json({ error: "Job not found" });
     if (req.user!.role === "driver" && job.claimedByDriverId !== req.user!.userId) {
       return res.status(403).json({ error: "Not your job" });
+    }
+    if (req.user!.role === "driver" && job.status !== "in_progress") {
+      return res.status(400).json({ error: "Start the route before marking it complete" });
     }
 
     const updated = storage.updateJob(id, { status: "completed", completedAt: new Date().toISOString() });

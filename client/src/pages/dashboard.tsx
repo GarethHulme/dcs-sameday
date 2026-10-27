@@ -201,7 +201,7 @@ function ManagerDashboard() {
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Same Day Overview</h1>
+          <h1 className="text-2xl font-semibold">Drivr-Sameday Overview</h1>
           <p className="text-muted-foreground text-sm">Today: {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</p>
         </div>
         <Button onClick={() => navigate("/jobs/new")}><Plus className="h-4 w-4 mr-2" />Post Job</Button>
